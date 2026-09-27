@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#0f1216"/>
+  <text x="600" y="400" font-family="Arial,sans-serif" font-size="64" font-weight="bold" fill="#e6e9ee" text-anchor="middle">J'ai passé 3 jours</text>
+  <text x="600" y="490" font-family="Arial,sans-serif" font-size="64" font-weight="bold" fill="#e6e9ee" text-anchor="middle">à configurer XAMPP.</text>
+  <text x="600" y="620" font-family="Arial,sans-serif" font-size="48" fill="#4c9aff" text-anchor="middle">Puis j'ai créé un outil</text>
+  <text x="600" y="700" font-family="Arial,sans-serif" font-size="48" fill="#4c9aff" text-anchor="middle">qui le fait en 10 secondes.</text>
+  <text x="600" y="850" font-family="Arial,sans-serif" font-size="36" fill="#3fb950" text-anchor="middle">DevEnv Doctor — Open Source · Gratuit</text>
+</svg>
