@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevEnv Doctor — Diagnostic de votre environnement de développement</title>
+<meta name="description" content="36 tests automatiques pour diagnostiquer PHP, MySQL, Apache, vos fichiers et outils. En 10 secondes, savez exactement ce qui ne va pas et comment le corriger.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>">
+<style>
+  :root {
+    --bg:#0f1216; --panel:#171b21; --panel2:#1e232b; --line:#2a313b;
+    --fg:#e6e9ee; --muted:#98a2b0; --accent:#4c9aff;
+    --ok:#3fb950; --warn:#d29922; --ko:#f85149;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg:#f4f6f9; --panel:#fff; --panel2:#f0f3f7; --line:#dde3ea;
+      --fg:#1b1f24; --muted:#5c6773; --accent:#0a58ca;
+    }
+  }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background:var(--bg); color:var(--fg); font:16px/1.6 ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:960px; margin:0 auto; padding:0 20px }
+
+  /* Hero */
+  .hero { text-align:center; padding:80px 0 60px; }
+  .hero h1 { font-size:48px; font-weight:800; letter-spacing:-.02em; line-height:1.1; margin-bottom:16px; }
+  .hero h1 span { color:var(--accent); }
+  .hero p { font-size:20px; color:var(--muted); max-width:600px; margin:0 auto 32px; }
+  .btn { display:inline-block; background:var(--accent); color:#fff; padding:14px 32px;
+         border-radius:10px; font-size:18px; font-weight:600; text-decoration:none;
+         transition:transform .15s ease, box-shadow .15s ease; }
+  .btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(76,154,255,.35); }
+  .btn-sub { display:block; margin-top:12px; font-size:14px; color:var(--muted); }
+
+  /* Score démo */
+  .demo { background:var(--panel); border:1px solid var(--line); border-radius:16px;
+          padding:32px; margin:40px 0; text-align:center; }
+  .demo-score { font-size:64px; font-weight:800; color:var(--ok); }
+  .demo-bar { height:8px; background:var(--line); border-radius:99px; margin:16px auto; max-width:400px; overflow:hidden; }
+  .demo-bar-fill { height:100%; background:var(--ok); border-radius:99px; width:95%; }
+  .demo p { color:var(--muted); }
+
+  /* Features */
+  .features { padding:60px 0; }
+  .features h2 { text-align:center; font-size:32px; margin-bottom:40px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:24px; }
+  .card .icon { font-size:32px; margin-bottom:12px; }
+  .card h3 { font-size:18px; margin-bottom:8px; }
+  .card p { color:var(--muted); font-size:14px; }
+
+  /* Comment ça marche */
+  .how { padding:60px 0; }
+  .how h2 { text-align:center; font-size:32px; margin-bottom:40px; }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:24px; }
+  .step { text-align:center; }
+  .step .num { width:48px; height:48px; background:var(--accent); color:#fff; border-radius:50%;
+              display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; margin:0 auto 12px; }
+  .step h3 { font-size:16px; margin-bottom:6px; }
+  .step p { color:var(--muted); font-size:14px; }
+
+  /* Tarifs */
+  .pricing { padding:60px 0; }
+  .pricing h2 { text-align:center; font-size:32px; margin-bottom:8px; }
+  .pricing .sub { text-align:center; color:var(--muted); margin-bottom:40px; }
+  .plans { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; max-width:680px; margin:0 auto; }
+  .plan { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:32px; text-align:center; }
+  .plan.featured { border-color:var(--accent); position:relative; }
+  .plan.featured::before { content:"POPULAIRE"; position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+                           background:var(--accent); color:#fff; font-size:11px; font-weight:700;
+                           padding:4px 12px; border-radius:99px; letter-spacing:.05em; }
+  .plan h3 { font-size:20px; margin-bottom:8px; }
+  .plan .price { font-size:40px; font-weight:800; margin:16px 0; }
+  .plan .price small { font-size:16px; color:var(--muted); font-weight:400; }
+  .plan ul { list-style:none; text-align:left; margin:20px 0; }
+  .plan li { padding:8px 0; color:var(--muted); font-size:14px; }
+  .plan li::before { content:"✓ "; color:var(--ok); font-weight:700; }
+  .plan .btn { width:100%; }
+
+  /* FAQ */
+  .faq { padding:60px 0; }
+  .faq h2 { text-align:center; font-size:32px; margin-bottom:40px; }
+  .faq details { background:var(--panel); border:1px solid var(--line); border-radius:10px; margin-bottom:10px; padding:16px 20px; }
+  .faq summary { cursor:pointer; font-weight:600; }
+  .faq details p { margin-top:10px; color:var(--muted); font-size:14px; }
+
+  /* CTA final */
+  .cta { text-align:center; padding:80px 0; }
+  .cta h2 { font-size:36px; margin-bottom:16px; }
+  .cta p { color:var(--muted); margin-bottom:32px; }
+
+  footer { text-align:center; padding:40px 0; color:var(--muted); font-size:14px; border-top:1px solid var(--line); }
+  footer a { color:var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>DevEnv <span>Doctor</span></h1>
+    <p>36 tests automatiques pour diagnostiquer votre environnement de développement en 10 secondes. PHP, MySQL, Apache, fichiers, outils CLI et réseau.</p>
+    <a href="#prix" class="btn">Acheter — 29 €</a>
+    <span class="btn-sub">Paiement sécurisé · Licence à vie · Mises à jour incluses</span>
+  </section>
+
+  <!-- Démo score -->
+  <section class="demo">
+    <div class="demo-score">95<span style="font-size:24px;color:var(--muted)">/100</span></div>
+    <div class="demo-bar"><div class="demo-bar-fill"></div></div>
+    <p>Exemple de rapport : 29 tests OK, 3 avertissements, 0 échec — en 16 secondes</p>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <h2>Ce qui est testé</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">🐘</div>
+        <h3>Serveur & PHP</h3>
+        <p>Version PHP, extensions critiques, php.ini, sessions, fuseau horaire, display_errors</p>
+      </div>
+      <div class="card">
+        <div class="icon">🗄️</div>
+        <h3>Base de données</h3>
+        <p>Connexion mysqli, self-test CRUD complet, transactions InnoDB, rollback</p>
+      </div>
+      <div class="card">
+        <div class="icon">📁</div>
+        <h3>Fichiers & droits</h3>
+        <p>Écriture/lecture/suppression, fichier 2 Mo, dossier temporaire, permissions</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔧</div>
+        <h3>Outils CLI</h3>
+        <p>Node, npm, git, Composer, PHP CLI, VS Code, Python, MySQL client</p>
+      </div>
+      <div class="card">
+        <div class="icon">🌐</div>
+        <h3>Réseau</h3>
+        <p>Ports locaux, DNS, résolution nom d'hôte, accès HTTPS sortant</p>
+      </div>
+      <div class="card">
+        <div class="icon">🩺</div>
+        <h3>Correctifs exacts</h3>
+        <p>Chaque échec affiche le fichier, la directive et la ligne à corriger</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comment ça marche -->
+  <section class="how">
+    <h2>Comment ça marche</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Téléchargez</h3>
+        <p>Copiez le projet dans votre htdocs ou lancez le serveur intégré</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Ouvrez</h3>
+        <p>Accédez à l'interface web ou lancez la commande CLI</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Corrigez</h3>
+        <p>Suivez les correctifs exacts pour chaque échec détecté</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tarifs -->
+  <section class="pricing" id="prix">
+    <h2>Tarifs</h2>
+    <p class="sub">Licence à vie · Mises à jour incluses · Support par email</p>
+    <div class="plans">
+      <div class="plan">
+        <h3>Gratuit</h3>
+        <div class="price">0 €</div>
+        <ul>
+          <li>36 tests complets</li>
+          <li>Interface web</li>
+          <li>Export JSON</li>
+          <li>Correctifs exacts</li>
+        </ul>
+        <a href="https://github.com/Samuel-12094/devcheck" class="btn">GitHub</a>
+      </div>
+      <div class="plan featured">
+        <h3>Pro</h3>
+        <div class="price">29 €<small> TTC</small></div>
+        <ul>
+          <li>Tout le gratuit</li>
+          <li>Export PDF du rapport</li>
+          <li>Historique des rapports</li>
+          <li>Alertes par email</li>
+          <li>Support prioritaire</li>
+        </ul>
+        <a href="#" class="btn">Acheter sur Gumroad</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <h2>FAQ</h2>
+    <details>
+      <summary>Sur quels systèmes ça marche ?</summary>
+      <p>Windows (XAMPP, Laragon, WAMP), macOS et Linux. PHP 8.1+ requis.</p>
+    </details>
+    <details>
+      <summary>Le self-test de base de données est-il dangereux ?</summary>
+      <p>Non. Il crée une base temporaire `devcheck_db`, effectue des tests puis la supprime. Aucune donnée existante n'est touchée.</p>
+    </details>
+    <details>
+      <summary>Puis-je l'utiliser en intégration continue ?</summary>
+      <p>Oui. `php bin/doctor.php --json --fail` retourne un code de sortie 1 en cas d'échec, parfait pour bloquer un déploiement.</p>
+    </details>
+    <details>
+      <summary>Y a-t-il des mises à jour ?</summary>
+      <p>Oui, les mises à jour sont incluses dans la licence Pro. Vous serez informé par email.</p>
+    </details>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Prêt à diagnostiquer votre environnement ?</h2>
+    <p>Téléchargez DevEnv Doctor et obtenez un rapport complet en 10 secondes.</p>
+    <a href="https://github.com/Samuel-12094/devcheck" class="btn">Télécharger gratuitement</a>
+  </section>
+
+  <footer>
+    <p>© 2026 HOUSSOU Samuel · <a href="https://github.com/Samuel-12094/devcheck">GitHub</a> · Licence MIT</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
