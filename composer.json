@@ -1,0 +1,22 @@
+{
+    "name": "devcheck/doctor",
+    "description": "Diagnostic de l'environnement de developpement local (PHP / Apache / MySQL / outils CLI / reseau)",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "DevCheck\\": "src/"
+        }
+    },
+    "scripts": {
+        "check": "@php bin/doctor.php",
+        "check:json": "@php bin/doctor.php --json",
+        "serve": "@php -S localhost:8080 -t ."
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
